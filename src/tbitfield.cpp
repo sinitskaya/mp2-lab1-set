@@ -11,13 +11,12 @@ TBitField::TBitField(int len)
 {
 	if (len < -1)
 		throw out_of_range("out of range");
-
-	MemLen = (len + 15)>> 4; 
+	BitLen = len;
+	MemLen = (BitLen + sizeof(TELEM)*8-1)/(sizeof(TELEM)*8); 
 	pMem = new TELEM[MemLen]; 
 	if ( pMem != NULL )
 		for ( int i=0; i < MemLen; i++ ) 
 			pMem[i] = 0; 
-	BitLen = len;
 }
 
 TBitField::TBitField(const TBitField &bf) // конструктор копирования
@@ -37,12 +36,12 @@ TBitField::~TBitField()
 
 int TBitField::GetMemIndex(const int n) const // индекс Мем для бита n
 {
-	return n >> 4; 
+	return n >> 5; 
 }
 
 TELEM TBitField::GetMemMask(const int n) const // битовая маска для бита n
 {
-	return 1 << (n & 15);
+	return 1 << (n & 31);
 }
 
 // доступ к битам битового поля
@@ -54,10 +53,8 @@ int TBitField::GetLength(void) const // получить длину (к-во б�
 
 void TBitField::SetBit(const int n) // установить бит
 {
-	int a = GetMemIndex(n); 
 	if ((n < 0) || (n > BitLen))
-		throw
-		out_of_range("Out of range");
+		throw out_of_range("Out of range");
 	pMem[GetMemIndex(n)] |= GetMemMask(n);
 }
 
@@ -70,11 +67,9 @@ void TBitField::ClrBit(const int n) // очистить бит
 
 int TBitField::GetBit(const int n) const // получить значение бита
 {
-  int a = GetMemIndex(n); 
 	if ((n < 0) || (n > BitLen)) 
-		throw
-		out_of_range("out of range");
-	return pMem[a] & GetMemMask(n); 
+		throw out_of_range("out of range");
+	return pMem[GetMemIndex(n)] & GetMemMask(n); 
 }
 
 // битовые операции
@@ -118,7 +113,7 @@ int TBitField::operator!=(const TBitField &bf) const // сравнение
 				break; 
 			}  
 		flag = 1; 
-		} 
+	} 
 	return flag;
 }
 
@@ -162,21 +157,14 @@ TBitField TBitField::operator~(void) // отрицание
 
 istream &operator>>(istream &istr, TBitField &bf) // ввод
 {
-	int i=0; char ch;
-	do { istr >> ch; } while (ch !=' ');
-	while (1) 
-	{ 
-		istr>> ch;
-		if ( ch == '0' ) bf.ClrBit(i++);
-		else if ( ch == '1' ) bf.SetBit(i++); 
-		else break;
-	}
+	for (int i=0; i< bf.MemLen; i++)
+		istr >> bf.pMem[i];
 	return istr;
 }
 
 ostream &operator<<(ostream &ostr, const TBitField &bf) // вывод
 {
-	for (int i=0; i<bf.MemLen;i++) 
+	for (int i=0; i<bf.MemLen; i++) 
 		ostr << bf.pMem[i];
 	return ostr;
 }
