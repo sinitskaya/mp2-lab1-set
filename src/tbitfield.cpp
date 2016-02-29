@@ -1,4 +1,4 @@
-// ННГУ, ВМК, Курс "Методы программирования-2", С++, ООП
+﻿// ННГУ, ВМК, Курс "Методы программирования-2", С++, ООП
 //
 // tbitfield.cpp - Copyright (c) Гергель В.П. 07.05.2001
 //   Переработано для Microsoft Visual Studio 2008 Сысоевым А.В. (19.04.2015)
@@ -76,12 +76,15 @@ int TBitField::GetBit(const int n) const // получить значение б
 
 TBitField& TBitField::operator=(const TBitField &bf) // присваивание
 {
-	BitLen = bf.BitLen; 
-	MemLen = bf.MemLen; 
-	delete []pMem; 
-	pMem = new TELEM [MemLen]; 
-	for (int i=0;i<MemLen;i++) 
-		pMem[i] = bf.pMem[i]; 
+	if (this != &bf)
+	{
+		BitLen = bf.BitLen; 
+		MemLen = bf.MemLen; 
+		delete []pMem; 
+		pMem = new TELEM [MemLen]; 
+		for (int i=0;i<MemLen;i++) 
+			pMem[i] = bf.pMem[i];
+	}
 	return *this;
 }
 
