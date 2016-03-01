@@ -74,7 +74,7 @@ int TBitField::GetBit(const int n) const // получить значение б
 
 // битовые операции
 
-TBitField& TBitField::operator=(const TBitField &bf) // присваивание
+TBitField& TBitField::operator= (const TBitField &bf) // присваивание
 {
 	if (this != &bf)
 	{
